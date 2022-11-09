@@ -595,7 +595,7 @@ func (r *CodeServerReconciler) getInstanceEndpoint(m *csv1alpha1.CodeServer) str
 	instanceRuntime := string(m.Spec.Runtime)
 	if strings.EqualFold(instanceRuntime, string(csv1alpha1.RuntimeGotty)) || strings.EqualFold(instanceRuntime, string(csv1alpha1.RuntimeLxd)) {
 		return fmt.Sprintf("wss://%s.%s/ws", m.Spec.Subdomain, r.Options.DomainName)
-	} else if strings.EqualFold(instanceRuntime, string(csv1alpha1.RuntimeGeneric)) {
+	} else if strings.EqualFold(instanceRuntime, string(csv1alpha1.RuntimeGeneric)) && len(m.Spec.ConnectionString) != 0 {
 		return fmt.Sprintf(m.Spec.ConnectionString, m.Spec.Subdomain, r.Options.DomainName)
 	} else {
 		return fmt.Sprintf("https://%s.%s/", m.Spec.Subdomain, r.Options.DomainName)
@@ -1277,13 +1277,7 @@ func filterOutCondition(states *csv1alpha1.CodeServerStatus, currentCondition cs
 
 		if currentCondition.Type == csv1alpha1.ServerReady && currentCondition.Status == corev1.ConditionTrue {
 			if condition.Type == csv1alpha1.ServerRecycled || condition.Type == csv1alpha1.ServerInactive ||
-				currentCondition.Type == csv1alpha1.ServerErrored {
-				condition.Status = corev1.ConditionFalse
-				condition.LastUpdateTime = metav1.Now()
-				condition.LastTransitionTime = metav1.Now()
-			}
-			if condition.Type == csv1alpha1.ServerErrored || condition.Status == corev1.ConditionTrue {
-				//update error condition if ready is true
+				condition.Type == csv1alpha1.ServerErrored {
 				condition.Status = corev1.ConditionFalse
 				condition.LastUpdateTime = metav1.Now()
 				condition.LastTransitionTime = metav1.Now()
