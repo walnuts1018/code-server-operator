@@ -2,7 +2,7 @@ apiVersion: cs.opensourceways.com/v1alpha1
 kind: CodeServer
 metadata:
   name: codeserver-gotty
-  namespace: default
+  namespace: mindspore-xihe
 spec:
   runtime: generic
   subdomain: codeservergotty
