@@ -1286,6 +1286,7 @@ func (r *CodeServerReconciler) annotationsForIngress(enableOauth2Proxy bool) map
 	if enableOauth2Proxy {
 		annotation["nginx.ingress.kubernetes.io/auth-url"] = "https://$host/oauth2/auth"
 		annotation["nginx.ingress.kubernetes.io/auth-signin"] = "https://$host/oauth2/start?rd=$escaped_request_uri"
+		annotation["nginx.ingress.kubernetes.io/auth-response-headers"] = "X-Auth-Request-User,X-Auth-Request-Groups,X-Auth-Request-Email,X-Auth-Request-Preferred-Username,X-Auth-Request-Access-Token"
 	}
 	return annotation
 }
