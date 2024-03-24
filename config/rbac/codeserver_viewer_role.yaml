@@ -1,7 +1,14 @@
-# permissions to do viewer codeservers.
+# permissions for end users to view codeservers.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: codeserver-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: code-server-operator
+    app.kubernetes.io/part-of: code-server-operator
+    app.kubernetes.io/managed-by: kustomize
   name: codeserver-viewer-role
 rules:
 - apiGroups:

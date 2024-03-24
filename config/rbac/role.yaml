@@ -1,9 +1,7 @@
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: manager-role
 rules:
 - apiGroups:
@@ -21,60 +19,14 @@ rules:
 - apiGroups:
   - cs.opensourceways.com
   resources:
+  - codeservers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - cs.opensourceways.com
+  resources:
   - codeservers/status
   verbs:
   - get
   - patch
   - update
-- apiGroups:
-    - ""
-  resources:
-    - services
-    - endpoints
-    - events
-    - persistentvolumeclaims
-  verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
-- apiGroups:
-    - extensions
-  resources:
-    - deployments
-    - ingresses
-  verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
-- apiGroups:
-    - apps
-  resources:
-    - deployments
-  verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
-- apiGroups:
-    - ""
-  resources:
-    - secrets
-  verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch

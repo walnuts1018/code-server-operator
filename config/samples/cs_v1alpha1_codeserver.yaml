@@ -1,61 +1,12 @@
 apiVersion: cs.opensourceways.com/v1alpha1
 kind: CodeServer
 metadata:
-  # [Generated] resource identity, should be identical to other code server resource
-  name: container-test
-  namespace: default
+  labels:
+    app.kubernetes.io/name: codeserver
+    app.kubernetes.io/instance: codeserver-sample
+    app.kubernetes.io/part-of: code-server-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: code-server-operator
+  name: codeserver-sample
 spec:
-  runtime: lxd
-  # [Generated] instance host subdomain, should be identical and url safe
-  subdomain: husheng1234
-  image: "opensourceway/playground-lxc-launcher:sha-2b12023"
-  storageSize: "10Gi"
-  storageName: "default"
-  ingressBandwidth: "10M"
-  egressBandwidth: "100k"
-  inactiveAfterSeconds: 0
-  recycleAfterSeconds: 1800
-  readinessProbe:
-    httpGet:
-      path: "/active-time"
-      # connection port will be updated according to the http or https schema
-      port: 80
-    initialDelaySeconds: 6
-    periodSeconds: 3
-    timeoutSeconds: 3
-  workspaceLocation: "/workspace"
-  envs:
-    # env for gotty
-    - name: GOTTY_ONLY_ENABLE_BACKEND_WS_SERVER
-      value: "true"
-    - name: DISABLE_AUTO_UPDATE
-      value: "true"
-      # [Generated] instance websocket connection credential example:name:password
-    - name: GOTTY_CREDENTIAL
-      value: name:password
-    - name: COMMUNITY_USER
-      value: tommylike
-    - name: GOTTY_MAX_CONNECTION
-      value: "10"
-    - name: COMMUNITY_EMAIL
-      value: contact@openeuler.io
-    - name: GOTTY_WS_ORIGIN
-      value: ".*"
-    - name: GOTTY_PERMIT_WRITE
-      value: "true"
-    # env for lxd launcher
-    - name: LAUNCHER_ADDITIONAL_CONFIG #keep
-      value: raw.lxc=lxc.apparmor.profile=unconfined
-    - name: LAUNCHER_INSTANCE_PROFILES #keep
-      value: container
-    - name: LAUNCHER_IMAGE_ALIAS #keep
-      value: openeuler20.03-lts-sp2-container-x86
-    # env for terminal
-    - name: TERM
-      value: xterm
-  connectProbe: "/active-time"
-  privileged: false
-  resources:
-    requests:
-      cpu: "1"
-      memory: "1000Mi"
+  # TODO(user): Add fields here
