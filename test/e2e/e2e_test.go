@@ -24,7 +24,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/opensourceways/code-server-operator/test/utils"
+	"github.com/walnuts1018/code-server-operator/test/utils"
 )
 
 const namespace = "code-server-operator-system"

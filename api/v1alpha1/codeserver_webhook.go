@@ -1,5 +1,5 @@
 /*
-Copyright 2019 tommylikehu@gmail.com.
+Copyright 2024.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ func (r *CodeServer) SetupWebhookWithManager(mgr ctrl.Manager) error {
 
 // TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 
-//+kubebuilder:webhook:path=/mutate-cs-opensourceways-com-v1alpha1-codeserver,mutating=true,failurePolicy=fail,sideEffects=None,groups=cs.opensourceways.com,resources=codeservers,verbs=create;update,versions=v1alpha1,name=mcodeserver.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/mutate-cs-walnuts-dev-v1alpha1-codeserver,mutating=true,failurePolicy=fail,sideEffects=None,groups=cs.walnuts.dev,resources=codeservers,verbs=create;update,versions=v1alpha1,name=mcodeserver.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &CodeServer{}
 
@@ -48,7 +48,7 @@ func (r *CodeServer) Default() {
 }
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
-//+kubebuilder:webhook:path=/validate-cs-opensourceways-com-v1alpha1-codeserver,mutating=false,failurePolicy=fail,sideEffects=None,groups=cs.opensourceways.com,resources=codeservers,verbs=create;update,versions=v1alpha1,name=vcodeserver.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/validate-cs-walnuts-dev-v1alpha1-codeserver,mutating=false,failurePolicy=fail,sideEffects=None,groups=cs.walnuts.dev,resources=codeservers,verbs=create;update,versions=v1alpha1,name=vcodeserver.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Validator = &CodeServer{}
 

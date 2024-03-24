@@ -2,20 +2,20 @@
 # This file is used to track the info used to scaffold your project
 # and allow the plugins properly work.
 # More info: https://book.kubebuilder.io/reference/project-config.html
-domain: opensourceways.com
+domain: walnuts.dev
 layout:
 - go.kubebuilder.io/v4
 projectName: code-server-operator
-repo: github.com/opensourceways/code-server-operator
+repo: github.com/walnuts1018/code-server-operator
 resources:
 - api:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: opensourceways.com
+  domain: walnuts.dev
   group: cs
   kind: CodeServer
-  path: github.com/opensourceways/code-server-operator/api/v1alpha1
+  path: github.com/walnuts1018/code-server-operator/api/v1alpha1
   version: v1alpha1
   webhooks:
     defaulting: true

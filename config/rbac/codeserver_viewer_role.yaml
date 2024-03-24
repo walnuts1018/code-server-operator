@@ -12,7 +12,7 @@ metadata:
   name: codeserver-viewer-role
 rules:
 - apiGroups:
-  - cs.opensourceways.com
+  - cs.walnuts.dev
   resources:
   - codeservers
   verbs:
@@ -20,7 +20,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - cs.opensourceways.com
+  - cs.walnuts.dev
   resources:
   - codeservers/status
   verbs:

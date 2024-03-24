@@ -12,7 +12,7 @@ metadata:
   name: codeserver-editor-role
 rules:
 - apiGroups:
-  - cs.opensourceways.com
+  - cs.walnuts.dev
   resources:
   - codeservers
   verbs:
@@ -24,7 +24,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - cs.opensourceways.com
+  - cs.walnuts.dev
   resources:
   - codeservers/status
   verbs:

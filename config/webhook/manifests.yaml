@@ -10,12 +10,12 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /mutate-cs-opensourceways-com-v1alpha1-codeserver
+      path: /mutate-cs-walnuts-dev-v1alpha1-codeserver
   failurePolicy: Fail
   name: mcodeserver.kb.io
   rules:
   - apiGroups:
-    - cs.opensourceways.com
+    - cs.walnuts.dev
     apiVersions:
     - v1alpha1
     operations:
@@ -36,12 +36,12 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /validate-cs-opensourceways-com-v1alpha1-codeserver
+      path: /validate-cs-walnuts-dev-v1alpha1-codeserver
   failurePolicy: Fail
   name: vcodeserver.kb.io
   rules:
   - apiGroups:
-    - cs.opensourceways.com
+    - cs.walnuts.dev
     apiVersions:
     - v1alpha1
     operations:

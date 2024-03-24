@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	csv1alpha1 "github.com/opensourceways/code-server-operator/api/v1alpha1"
+	csv1alpha1 "github.com/walnuts1018/code-server-operator/api/v1alpha1"
 )
 
 // CodeServerReconciler reconciles a CodeServer object
@@ -33,9 +33,9 @@ type CodeServerReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=cs.opensourceways.com,resources=codeservers,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=cs.opensourceways.com,resources=codeservers/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=cs.opensourceways.com,resources=codeservers/finalizers,verbs=update
+//+kubebuilder:rbac:groups=cs.walnuts.dev,resources=codeservers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=cs.walnuts.dev,resources=codeservers/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=cs.walnuts.dev,resources=codeservers/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.

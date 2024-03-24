@@ -27,7 +27,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	csv1alpha1 "github.com/opensourceways/code-server-operator/api/v1alpha1"
+	csv1alpha1 "github.com/walnuts1018/code-server-operator/api/v1alpha1"
 )
 
 var _ = Describe("CodeServer Controller", func() {

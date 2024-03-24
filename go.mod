@@ -1,4 +1,4 @@
-module github.com/opensourceways/code-server-operator
+module github.com/walnuts1018/code-server-operator
 
 go 1.21
 

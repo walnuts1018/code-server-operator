@@ -34,8 +34,8 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	csv1alpha1 "github.com/opensourceways/code-server-operator/api/v1alpha1"
-	"github.com/opensourceways/code-server-operator/internal/controller"
+	csv1alpha1 "github.com/walnuts1018/code-server-operator/api/v1alpha1"
+	"github.com/walnuts1018/code-server-operator/internal/controller"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -104,7 +104,7 @@ func main() {
 		WebhookServer:          webhookServer,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "beb50962.opensourceways.com",
+		LeaderElectionID:       "72b04509.walnuts.dev",
 		// LeaderElectionReleaseOnCancel defines if the leader should step down voluntarily
 		// when the Manager ends. This requires the binary to immediately end when the
 		// Manager is stopped, otherwise, this setting is unsafe. Setting this significantly
