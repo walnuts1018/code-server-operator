@@ -1,0 +1,11 @@
+apiVersion: ctlptl.dev/v1alpha1
+kind: Registry
+name: codeserver-registry
+port: 5000
+---
+apiVersion: ctlptl.dev/v1alpha1
+kind: Cluster
+name: kind-codeserver-dev
+product: kind
+kubernetesVersion: v1.27.3
+registry: codeserver-registry
