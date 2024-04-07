@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  code-server-operator:
+  - apiVersion: v2
+    appVersion: 0.1.5
+    created: "2024-04-07T12:04:40.551101322Z"
+    description: A Helm chart for code-server-operator
+    digest: d7bf01621aea07f1c4b95a2610bf26454145846e846f1afd6bc25bfda19470a2
+    name: code-server-operator
+    type: application
+    urls:
+    - https://github.com/walnuts1018/code-server-operator/releases/download/code-server-operator-chart-0.1.5/code-server-operator-0.1.5.tgz
+    version: 0.1.5
+generated: "2024-04-07T12:04:40.551113946Z"
