@@ -32,7 +32,7 @@ controllerManager:
         - ALL
     image:
       repository: controller
-      tag: latest
+      tag: version-placeholder
     resources:
       limits:
         cpu: 500m
