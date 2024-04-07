@@ -3,10 +3,8 @@ module github.com/walnuts1018/code-server-operator
 go 1.21
 
 require (
-	github.com/golang/glog v1.2.0
 	github.com/onsi/ginkgo/v2 v2.14.0
 	github.com/onsi/gomega v1.30.0
-	github.com/opensourceways/code-server-operator v0.0.0-20231021034931-f7b716f5568d
 	k8s.io/api v0.29.0
 	k8s.io/apimachinery v0.29.0
 	k8s.io/client-go v0.29.0
