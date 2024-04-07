@@ -65,7 +65,8 @@ jobs:
         run: |
           sed --in-place "s/version-placeholder/${{ github.event.release.tag_name }}/g" charts/code-server-operator/Chart.yaml
           sed --in-place "s/version-placeholder/${{ github.event.release.tag_name }}/g" charts/code-server-operator/Chart.yaml
-          sed --in-place "s/version-placeholder/${{ github.event.release.tag_name }}/g" charts/code-server-operator/values.yaml
+          sed --in-place "s/latest/${{ github.event.release.tag_name }}/g" charts/code-server-operator/values.yaml
+          sed --in-place "s/repository: controller/repository: ghcr.io\/walnuts1018\/code-server-operator/g" charts/code-server-operator/values.yaml
 
       - name: Create release notes
         run: |
