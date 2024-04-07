@@ -46,6 +46,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: TARGETARCH=amd64,TARGETOS=linux
           tags: |
             ghcr.io/walnuts1018/code-server-operator:latest
             ghcr.io/walnuts1018/code-server-operator:${{ github.event.release.tag_name }}
