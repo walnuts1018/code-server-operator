@@ -1,0 +1,29 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: {{ include "code-server-operator.fullname" . }}-validating-webhook-configuration
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ include "code-server-operator.fullname" . }}-serving-cert
+  labels:
+  {{- include "code-server-operator.labels" . | nindent 4 }}
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "code-server-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-cs-walnuts-dev-v1alpha1-codeserver
+  failurePolicy: Fail
+  name: vcodeserver.kb.io
+  rules:
+  - apiGroups:
+    - cs.walnuts.dev
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - codeservers
+  sideEffects: None

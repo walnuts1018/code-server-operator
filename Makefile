@@ -137,6 +137,11 @@ build-installer: manifests generate kustomize ## Generate a consolidated YAML wi
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default >> dist/install.yaml
 
+
+.PHONY: helm-build
+helm-build: ## Build helm chart
+	kustomize build config/default | helmify -crd-dir charts/code-server-operator
+
 ##@ Deployment
 
 ifndef ignore-not-found
