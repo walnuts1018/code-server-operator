@@ -51,6 +51,46 @@ jobs:
             ghcr.io/walnuts1018/code-server-operator:latest
             ghcr.io/walnuts1018/code-server-operator:${{ github.event.release.tag_name }}
 
+  chart-release:
+    runs-on: ubuntu-latest
+    needs: ImageBuild
+    if: contains(needs.ImageBuild.result, 'success')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set chart version
+        run: |
+          sed --in-place "s/version-placeholder/${{ github.event.release.tag_name }}/g" charts/code-server-operator/Chart.yaml
+          sed --in-place "s/version-placeholder/${{ github.event.release.tag_name }}/g" charts/code-server-operator/Chart.yaml
+          sed --in-place "s/version-placeholder/${{ github.event.release.tag_name }}/g" charts/code-server-operator/values.yaml
+
+      - name: Create release notes
+        run: |
+          # Helm Chart のリリースノートには、本体のリリースへのリンクを追加する
+          tag_version=${GITHUB_REF##*/}
+          cat <<EOF > ./charts/code-server-operator/RELEASE.md
+          Helm chart for Website Operator [$tag_version](https://github.com/walnuts1018/code-server-operator/releases/tag/$tag_version)
+
+          EOF
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.5.0
+        with:
+          config: cr.yaml
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
   SucceessNotification:
     if: ${{ success() }}
     name: Send Success Message
