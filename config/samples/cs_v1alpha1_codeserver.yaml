@@ -22,4 +22,4 @@ spec:
   image: "ghcr.io/kmc-jp/code-server-images-golang:latest"
   imagePullSecrets:
     - name: ghcr-login-secret
-  domain: "codeservertest.walnuts.dev"
+  domain: "walnuts.dev"

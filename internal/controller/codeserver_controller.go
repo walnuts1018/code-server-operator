@@ -462,7 +462,7 @@ func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer 
 	if err != nil {
 		return fmt.Errorf("failed to parse domain: %w", err)
 	}
-	host := fmt.Sprintf("%s.%s", codeServer.Name, url.Hostname())
+	host := fmt.Sprintf("%s.%s", codeServer.Name, url.String())
 
 	ingress := networkingv1apply.Ingress(codeServer.Name, codeServer.Namespace).
 		WithLabels(map[string]string{
