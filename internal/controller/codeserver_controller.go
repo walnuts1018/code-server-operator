@@ -19,6 +19,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	csv1alpha1 "github.com/walnuts1018/code-server-operator/api/v1alpha1"
 	"github.com/walnuts1018/code-server-operator/internal/initplugins"
@@ -457,6 +458,12 @@ func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer 
 		return fmt.Errorf("failed to create controller reference: %w", err)
 	}
 
+	url, err := url.Parse(codeServer.Spec.Domain)
+	if err != nil {
+		return fmt.Errorf("failed to parse domain: %w", err)
+	}
+	host := fmt.Sprintf("%s.%s", codeServer.Name, url.Hostname())
+
 	ingress := networkingv1apply.Ingress(codeServer.Name, codeServer.Namespace).
 		WithLabels(map[string]string{
 			"app.kubernetes.io/name":       CodeServer,
@@ -466,7 +473,7 @@ func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer 
 		WithOwnerReferences(owner).
 		WithSpec(networkingv1apply.IngressSpec().
 			WithRules(networkingv1apply.IngressRule().
-				WithHost(codeServer.Spec.Domain).
+				WithHost(host).
 				WithHTTP(networkingv1apply.HTTPIngressRuleValue().
 					WithPaths(networkingv1apply.HTTPIngressPath().
 						WithPath("/").
