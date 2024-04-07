@@ -1,0 +1,28 @@
+apiVersion: cs.walnuts.dev/v1alpha1
+kind: CodeServerDeployment
+metadata:
+  labels:
+    app.kubernetes.io/name: codeserverdeployment
+    app.kubernetes.io/instance: codeserverdeployment-sample
+    app.kubernetes.io/part-of: code-server-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: code-server-operator
+  name: codeserverdeployment-sample
+spec:
+  replicas: 3
+  template:
+    spec:
+      storageSize: 512Mi
+      initPlugins:
+        git:
+          repourl: "github.com/walnuts1018/http-dump"
+          branch: "master"
+        copyDefaultConfig: {}
+        copyHome: {}
+      envs:
+        - name: LANGUAGE_DEFAULT
+          value: "ja"
+      image: "ghcr.io/kmc-jp/code-server-images-golang:latest"
+      imagePullSecrets:
+        - name: ghcr-login-secret
+      domain: "codeservertest.walnuts.dev"

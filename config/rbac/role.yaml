@@ -75,6 +75,58 @@ rules:
 - apiGroups:
   - cs.walnuts.dev
   resources:
+  - codeserver
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cs.walnuts.dev
+  resources:
+  - codeserver/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - cs.walnuts.dev
+  resources:
+  - codeserver/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - cs.walnuts.dev
+  resources:
+  - codeserverdeployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cs.walnuts.dev
+  resources:
+  - codeserverdeployments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - cs.walnuts.dev
+  resources:
+  - codeserverdeployments/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - cs.walnuts.dev
+  resources:
   - codeservers
   verbs:
   - create

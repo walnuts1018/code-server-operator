@@ -1,0 +1,27 @@
+# permissions for end users to view codeserverdeployments.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: codeserverdeployment-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: code-server-operator
+    app.kubernetes.io/part-of: code-server-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: codeserverdeployment-viewer-role
+rules:
+- apiGroups:
+  - cs.walnuts.dev
+  resources:
+  - codeserverdeployments
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - cs.walnuts.dev
+  resources:
+  - codeserverdeployments/status
+  verbs:
+  - get

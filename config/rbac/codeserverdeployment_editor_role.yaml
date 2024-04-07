@@ -1,0 +1,31 @@
+# permissions for end users to edit codeserverdeployments.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: codeserverdeployment-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: code-server-operator
+    app.kubernetes.io/part-of: code-server-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: codeserverdeployment-editor-role
+rules:
+- apiGroups:
+  - cs.walnuts.dev
+  resources:
+  - codeserverdeployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cs.walnuts.dev
+  resources:
+  - codeserverdeployments/status
+  verbs:
+  - get

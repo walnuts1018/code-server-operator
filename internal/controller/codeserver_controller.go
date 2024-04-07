@@ -40,6 +40,7 @@ import (
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
@@ -131,13 +132,13 @@ func (r *CodeServerReconciler) reconcileSecret(ctx context.Context, codeServer c
 		}
 
 		if _, ok := secret.Data["password"]; !ok {
-			pass, err := random.String(16)
+			pass, err := random.String(16, random.Alphanumeric)
 			if err != nil {
 				return fmt.Errorf("failed to generate password: %w", err)
 			}
 			secret.Data["password"] = []byte(pass)
 		}
-		return nil
+		return ctrl.SetControllerReference(&codeServer, secret, r.Scheme)
 	})
 
 	if err != nil {
@@ -196,7 +197,7 @@ func (r *CodeServerReconciler) reconcilePVC(ctx context.Context, codeServer csv1
 			pvc.Spec.VolumeName = codeServer.Spec.VolumeName
 		}
 
-		return nil
+		return ctrl.SetControllerReference(&codeServer, pvc, r.Scheme)
 	})
 
 	if err != nil {
@@ -212,6 +213,11 @@ func (r *CodeServerReconciler) reconcilePVC(ctx context.Context, codeServer csv1
 
 func (r *CodeServerReconciler) reconcileDeployment(ctx context.Context, codeServer csv1alpha1.CodeServer) error {
 	logger := log.FromContext(ctx)
+
+	owner, err := controllerReference(codeServer, r.Scheme)
+	if err != nil {
+		return fmt.Errorf("failed to create controller reference: %w", err)
+	}
 
 	const volumeName = "home"
 	initContainers, err := initplugins.CreatePlugin(codeServer.Spec.InitPlugins, initpluginsCommon.CommonFields{
@@ -291,6 +297,7 @@ func (r *CodeServerReconciler) reconcileDeployment(ctx context.Context, codeServ
 			"app.kubernetes.io/instance":   codeServer.Name,
 			"app.kubernetes.io/created-by": CodeServerManager,
 		}).
+		WithOwnerReferences(owner).
 		WithSpec(appsv1apply.DeploymentSpec().
 			WithReplicas(1).
 			WithSelector(metav1apply.LabelSelector().WithMatchLabels(map[string]string{
@@ -382,12 +389,18 @@ func (r *CodeServerReconciler) reconcileDeployment(ctx context.Context, codeServ
 func (r *CodeServerReconciler) reconcileService(ctx context.Context, codeServer csv1alpha1.CodeServer) error {
 	logger := log.FromContext(ctx)
 
+	owner, err := controllerReference(codeServer, r.Scheme)
+	if err != nil {
+		return fmt.Errorf("failed to create controller reference: %w", err)
+	}
+
 	service := corev1apply.Service(codeServer.Name, codeServer.Namespace).
 		WithLabels(map[string]string{
 			"app.kubernetes.io/name":       CodeServer,
 			"app.kubernetes.io/instance":   codeServer.Name,
 			"app.kubernetes.io/created-by": CodeServerManager,
 		}).
+		WithOwnerReferences(owner).
 		WithSpec(corev1apply.ServiceSpec().
 			WithType(corev1.ServiceTypeClusterIP).
 			WithPorts(corev1apply.ServicePort().
@@ -439,12 +452,18 @@ func (r *CodeServerReconciler) reconcileService(ctx context.Context, codeServer 
 func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer csv1alpha1.CodeServer) error {
 	logger := log.FromContext(ctx)
 
+	owner, err := controllerReference(codeServer, r.Scheme)
+	if err != nil {
+		return fmt.Errorf("failed to create controller reference: %w", err)
+	}
+
 	ingress := networkingv1apply.Ingress(codeServer.Name, codeServer.Namespace).
 		WithLabels(map[string]string{
 			"app.kubernetes.io/name":       CodeServer,
 			"app.kubernetes.io/instance":   codeServer.Name,
 			"app.kubernetes.io/created-by": CodeServerManager,
 		}).
+		WithOwnerReferences(owner).
 		WithSpec(networkingv1apply.IngressSpec().
 			WithRules(networkingv1apply.IngressRule().
 				WithHost(codeServer.Spec.Domain).
@@ -508,4 +527,19 @@ func (r *CodeServerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&corev1.Secret{}).
 		Owns(&networkingv1.Ingress{}).
 		Complete(r)
+}
+
+func controllerReference(codeServer csv1alpha1.CodeServer, scheme *runtime.Scheme) (*metav1apply.OwnerReferenceApplyConfiguration, error) {
+	gvk, err := apiutil.GVKForObject(&codeServer, scheme)
+	if err != nil {
+		return nil, err
+	}
+	ref := metav1apply.OwnerReference().
+		WithAPIVersion(gvk.GroupVersion().String()).
+		WithKind(gvk.Kind).
+		WithName(codeServer.Name).
+		WithUID(codeServer.GetUID()).
+		WithBlockOwnerDeletion(true).
+		WithController(true)
+	return ref, nil
 }
