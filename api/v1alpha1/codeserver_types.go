@@ -68,6 +68,8 @@ type CodeServerSpec struct {
 
 	// ImagePullSecrets is an optional list of references to secrets in the same namespace to use for pulling any of the images used by this PodSpec.
 	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets,omitempty"`
+
+	IngressClassName string `json:"ingressClassName,omitempty"`
 }
 
 // CodeServerStatus defines the observed state of CodeServer

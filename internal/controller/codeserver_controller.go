@@ -472,6 +472,7 @@ func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer 
 		}).
 		WithOwnerReferences(owner).
 		WithSpec(networkingv1apply.IngressSpec().
+			WithIngressClassName(codeServer.Spec.IngressClassName).
 			WithRules(networkingv1apply.IngressRule().
 				WithHost(host).
 				WithHTTP(networkingv1apply.HTTPIngressRuleValue().
