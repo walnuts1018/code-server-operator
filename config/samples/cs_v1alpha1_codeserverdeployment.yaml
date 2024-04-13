@@ -26,3 +26,5 @@ spec:
       imagePullSecrets:
         - name: ghcr-login-secret
       domain: "walnuts.dev"
+      publicProxyPorts:
+        - 8080

@@ -70,6 +70,9 @@ type CodeServerSpec struct {
 	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets,omitempty"`
 
 	IngressClassName string `json:"ingressClassName,omitempty"`
+
+	// PublicProxyPorts specifies the public proxy ports for code server
+	PublicProxyPorts []int32 `json:"publicProxyPorts,omitempty"`
 }
 
 // CodeServerStatus defines the observed state of CodeServer

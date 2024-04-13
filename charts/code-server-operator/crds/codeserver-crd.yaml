@@ -216,6 +216,13 @@ spec:
                   type: string
                 description: Specifies the node selector for scheduling.
                 type: object
+              publicProxyPorts:
+                description: PublicProxyPorts specifies the public proxy ports for
+                  code server
+                items:
+                  format: int32
+                  type: integer
+                type: array
               resources:
                 description: Specifies the resource requirements for code server pod.
                 properties:

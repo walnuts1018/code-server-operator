@@ -395,6 +395,23 @@ func (r *CodeServerReconciler) reconcileService(ctx context.Context, codeServer 
 		return fmt.Errorf("failed to create controller reference: %w", err)
 	}
 
+	ports := []*corev1apply.ServicePortApplyConfiguration{
+		corev1apply.ServicePort().
+			WithName("http").
+			WithProtocol(corev1.ProtocolTCP).
+			WithPort(codeServer.Spec.ContainerPort).
+			WithTargetPort(intstr.FromInt32(codeServer.Spec.ContainerPort)),
+	}
+
+	for _, port := range codeServer.Spec.PublicProxyPorts {
+		ports = append(ports, corev1apply.ServicePort().
+			WithName(fmt.Sprintf("http-%d", port)).
+			WithProtocol(corev1.ProtocolTCP).
+			WithPort(port).
+			WithTargetPort(intstr.FromInt32(port)),
+		)
+	}
+
 	service := corev1apply.Service(codeServer.Name, codeServer.Namespace).
 		WithLabels(map[string]string{
 			"app.kubernetes.io/name":       CodeServer,
@@ -404,11 +421,7 @@ func (r *CodeServerReconciler) reconcileService(ctx context.Context, codeServer 
 		WithOwnerReferences(owner).
 		WithSpec(corev1apply.ServiceSpec().
 			WithType(corev1.ServiceTypeClusterIP).
-			WithPorts(corev1apply.ServicePort().
-				WithName("http").
-				WithProtocol(corev1.ProtocolTCP).
-				WithPort(codeServer.Spec.ContainerPort).
-				WithTargetPort(intstr.FromInt32(codeServer.Spec.ContainerPort)),
+			WithPorts(ports...,
 			).
 			WithSelector(map[string]string{
 				"app.kubernetes.io/name":       CodeServer,
@@ -464,6 +477,48 @@ func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer 
 	}
 	host := fmt.Sprintf("%s.%s", codeServer.Name, url.String())
 
+	paths := []*networkingv1apply.HTTPIngressPathApplyConfiguration{networkingv1apply.HTTPIngressPath().
+		WithPath("/").
+		WithPathType(networkingv1.PathTypePrefix).
+		WithBackend(networkingv1apply.IngressBackend().
+			WithService(networkingv1apply.IngressServiceBackend().
+				WithName(codeServer.Name).
+				WithPort(networkingv1apply.ServiceBackendPort().
+					WithName("http"),
+				),
+			),
+		),
+	}
+
+	for _, port := range codeServer.Spec.PublicProxyPorts {
+		paths = append(paths, networkingv1apply.HTTPIngressPath().
+			WithPath(fmt.Sprintf("/proxy/%d", port)).
+			WithPathType(networkingv1.PathTypePrefix).
+			WithBackend(networkingv1apply.IngressBackend().
+				WithService(networkingv1apply.IngressServiceBackend().
+					WithName(codeServer.Name).
+					WithPort(networkingv1apply.ServiceBackendPort().
+						WithName(fmt.Sprintf("http-%d", port)),
+					),
+				),
+			),
+		)
+	}
+
+	spec := networkingv1apply.IngressSpec().
+		WithRules(networkingv1apply.IngressRule().
+			WithHost(host).
+			WithHTTP(networkingv1apply.HTTPIngressRuleValue().
+				WithPaths(
+					paths...,
+				),
+			),
+		)
+
+	if codeServer.Spec.IngressClassName != "" {
+		spec = spec.WithIngressClassName(codeServer.Spec.IngressClassName)
+	}
+
 	ingress := networkingv1apply.Ingress(codeServer.Name, codeServer.Namespace).
 		WithLabels(map[string]string{
 			"app.kubernetes.io/name":       CodeServer,
@@ -471,26 +526,7 @@ func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer 
 			"app.kubernetes.io/created-by": CodeServerManager,
 		}).
 		WithOwnerReferences(owner).
-		WithSpec(networkingv1apply.IngressSpec().
-			WithIngressClassName(codeServer.Spec.IngressClassName).
-			WithRules(networkingv1apply.IngressRule().
-				WithHost(host).
-				WithHTTP(networkingv1apply.HTTPIngressRuleValue().
-					WithPaths(networkingv1apply.HTTPIngressPath().
-						WithPath("/").
-						WithPathType(networkingv1.PathTypePrefix).
-						WithBackend(networkingv1apply.IngressBackend().
-							WithService(networkingv1apply.IngressServiceBackend().
-								WithName(codeServer.Name).
-								WithPort(networkingv1apply.ServiceBackendPort().
-									WithName("http"),
-								),
-							),
-						),
-					),
-				),
-			),
-		)
+		WithSpec(spec)
 
 	obj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(ingress)
 	if err != nil {
