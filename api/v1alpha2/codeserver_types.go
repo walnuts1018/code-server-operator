@@ -75,7 +75,7 @@ type CodeServerSpec struct {
 	PublicProxyPorts []int32 `json:"publicProxyPorts,omitempty"`
 
 	//InitCommand specifies the init commands that will be running to finish before code server running.
-	InitCommand string `json:"initCommands,omitempty"`
+	InitCommand string `json:"initCommand,omitempty"`
 }
 
 // CodeServerStatus defines the observed state of CodeServer
