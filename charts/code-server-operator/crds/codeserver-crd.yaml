@@ -203,7 +203,7 @@ spec:
                 type: array
               ingressClassName:
                 type: string
-              initCommands:
+              initCommand:
                 description: InitCommand specifies the init commands that will be
                   running to finish before code server running.
                 type: string
