@@ -20,16 +20,17 @@ import (
 	"context"
 	"fmt"
 
+	csv1alpha1 "github.com/walnuts1018/code-server-operator/api/v1alpha1"
 	"github.com/walnuts1018/code-server-operator/util/random"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-
-	csv1alpha1 "github.com/walnuts1018/code-server-operator/api/v1alpha1"
 )
 
 // CodeServerDeploymentReconciler reconciles a CodeServerDeployment object
@@ -125,32 +126,36 @@ func (r *CodeServerDeploymentReconciler) reconcileCodeServer(ctx context.Context
 		codeServer.Name = codeServerDeployments.Name + "-" + suffix
 		codeServer.Namespace = codeServerDeployments.Namespace
 
-		op, err := ctrl.CreateOrUpdate(ctx, r.Client, codeServer, func() error {
-			codeServer.Spec = codeServerDeployments.Spec.Template.Spec
-
-			if codeServer.Labels == nil {
-				codeServer.Labels = make(map[string]string)
-			}
-
-			codeServer.Labels["app.kubernetes.io/name"] = CodeServer
-			codeServer.Labels["app.kubernetes.io/instance"] = codeServer.Name
-			codeServer.Labels["app.kubernetes.io/created-by"] = CodeServerManager
-			codeServer.Labels["cs.walnuts.dev/codeserverdeployment"] = codeServerDeployments.Name
-
-			return ctrl.SetControllerReference(codeServerDeployments, codeServer, r.Scheme)
+		patch := &unstructured.Unstructured{}
+		patch.SetGroupVersionKind(csv1alpha1.GroupVersion.WithKind("CodeServer"))
+		patch.SetNamespace(codeServerDeployments.Namespace)
+		patch.SetName(codeServer.Name)
+		patch.SetLabels(map[string]string{
+			"app.kubernetes.io/name":              CodeServer,
+			"app.kubernetes.io/instance":          codeServer.Name,
+			"app.kubernetes.io/created-by":        CodeServerManager,
+			"cs.walnuts.dev/codeserverdeployment": codeServerDeployments.Name,
+		})
+		patch.UnstructuredContent()["spec"] = codeServerDeployments.Spec.Template.Spec
+		patch.SetOwnerReferences([]metav1.OwnerReference{
+			{
+				APIVersion:         codeServerDeployments.APIVersion,
+				Kind:               codeServerDeployments.Kind,
+				Name:               codeServerDeployments.Name,
+				UID:                codeServerDeployments.UID,
+				Controller:         func(b bool) *bool { return &b }(true),
+				BlockOwnerDeletion: func(b bool) *bool { return &b }(true),
+			},
 		})
 
-		if err != nil {
-			return fmt.Errorf("failed to reconcile CodeServer: %w", err)
-		}
-
-		if op != controllerutil.OperationResultNone {
-			logger.Info("Reconciled CodeServer", "operation", op)
+		if err := r.Patch(ctx, patch, client.Apply, &client.PatchOptions{FieldManager: CodeServerManager, Force: ptr.To(true)}); err != nil {
+			return fmt.Errorf("failed to apply CodeServer: %w", err)
 		}
 
 		continue
 	}
 
+	logger.Info("Reconcile CodeServer successfully")
 	return nil
 
 }
