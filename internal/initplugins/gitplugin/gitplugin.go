@@ -9,9 +9,10 @@ import (
 )
 
 type gitPlugin struct {
-	Repourl    string `required:"true" json:"repourl"`
-	Branch     string `json:"branch"`
-	VolumeName string `required:"true" json:"volumeName"`
+	Repourl     string `required:"true" json:"repourl"`
+	Branch      string `json:"branch"`
+	VolumeName  string `required:"true" json:"volumeName"`
+	InitCommand string `json:"initCommand"`
 }
 
 func New(params map[string]string) (common.PluginInterface, error) {
@@ -32,14 +33,17 @@ func New(params map[string]string) (common.PluginInterface, error) {
 }
 
 func (g *gitPlugin) GenerateInitContainerApplyConfiguration() *corev1apply.ContainerApplyConfiguration {
-	command := `
+	initCommand := fmt.Sprintf("cd /persistent/work && %v", g.InitCommand)
+
+	command := fmt.Sprintf(`
 		if [ ! -d /persistent/work ]; then
 			mkdir -p /persistent/work;
-			git clone -b ` + g.Branch + ` ` + g.Repourl + ` /persistent/work;
+			git clone -b `+g.Branch+` `+g.Repourl+` /persistent/work;
+			%v
 		else
 			echo 'work directory already exists';
 		fi
-	`
+	`, initCommand)
 
 	initcontainer := corev1apply.Container().
 		WithName("git").
