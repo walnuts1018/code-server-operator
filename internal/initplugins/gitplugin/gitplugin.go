@@ -9,11 +9,9 @@ import (
 )
 
 type gitPlugin struct {
-	Repourl     string `required:"true" json:"repourl"`
-	Branch      string `json:"branch"`
-	VolumeName  string `required:"true" json:"volumeName"`
-	Image       string `required:"true" json:"image"`
-	InitCommand string `json:"initCommand"`
+	Repourl    string `required:"true" json:"repourl"`
+	Branch     string `json:"branch"`
+	VolumeName string `required:"true" json:"volumeName"`
 }
 
 func New(params map[string]string) (common.PluginInterface, error) {
@@ -34,22 +32,18 @@ func New(params map[string]string) (common.PluginInterface, error) {
 }
 
 func (g *gitPlugin) GenerateInitContainerApplyConfiguration() *corev1apply.ContainerApplyConfiguration {
-	initCommand := fmt.Sprintf("cd /persistent/work && %v", g.InitCommand)
-
-	command := fmt.Sprintf(`
+	command := `
 		if [ ! -d /persistent/work ]; then
 			mkdir -p /persistent/work;
-			sudo apt install -y git;
-			git clone -b `+g.Branch+` `+g.Repourl+` /persistent/work;
-			%v
+			git clone -b ` + g.Branch + ` ` + g.Repourl + ` /persistent/work;
 		else
 			echo 'work directory already exists';
 		fi
-	`, initCommand)
+	`
 
 	initcontainer := corev1apply.Container().
 		WithName("git").
-		WithImage(g.Image).
+		WithImage("alpine/git").
 		WithCommand("sh", "-c", command).
 		WithVolumeMounts(corev1apply.VolumeMount().
 			WithName(g.VolumeName).
