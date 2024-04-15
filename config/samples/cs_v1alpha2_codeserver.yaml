@@ -1,4 +1,4 @@
-apiVersion: cs.walnuts.dev/v1alpha1
+apiVersion: cs.walnuts.dev/v1alpha2
 kind: CodeServer
 metadata:
   labels:

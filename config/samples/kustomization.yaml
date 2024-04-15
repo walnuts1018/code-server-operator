@@ -1,5 +1,5 @@
 ## Append samples of your project ##
 resources:
-- cs_v1alpha1_codeserver.yaml
-- cs_v1alpha1_codeserverdeployment.yaml
+- cs_v1alpha2_codeserver.yaml
+- cs_v1alpha2_codeserverdeployment.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

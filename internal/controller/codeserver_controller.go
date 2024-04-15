@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"net/url"
 
-	csv1alpha1 "github.com/walnuts1018/code-server-operator/api/v1alpha1"
+	csv1alpha2 "github.com/walnuts1018/code-server-operator/api/v1alpha2"
 	"github.com/walnuts1018/code-server-operator/internal/initplugins"
 	initpluginsCommon "github.com/walnuts1018/code-server-operator/internal/initplugins/common"
 	"github.com/walnuts1018/code-server-operator/util/random"
@@ -79,7 +79,7 @@ type CodeServerReconciler struct {
 func (r *CodeServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
-	var codeServer csv1alpha1.CodeServer
+	var codeServer csv1alpha2.CodeServer
 
 	// Fetch the CodeServer instance
 	err := r.Client.Get(ctx, req.NamespacedName, &codeServer)
@@ -120,7 +120,7 @@ func (r *CodeServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	return ctrl.Result{}, nil
 }
 
-func (r *CodeServerReconciler) reconcileSecret(ctx context.Context, codeServer csv1alpha1.CodeServer) error {
+func (r *CodeServerReconciler) reconcileSecret(ctx context.Context, codeServer csv1alpha2.CodeServer) error {
 	logger := log.FromContext(ctx)
 
 	secret := &corev1.Secret{}
@@ -153,7 +153,7 @@ func (r *CodeServerReconciler) reconcileSecret(ctx context.Context, codeServer c
 	return nil
 }
 
-func (r *CodeServerReconciler) reconcilePVC(ctx context.Context, codeServer csv1alpha1.CodeServer) error {
+func (r *CodeServerReconciler) reconcilePVC(ctx context.Context, codeServer csv1alpha2.CodeServer) error {
 	logger := log.FromContext(ctx)
 
 	pvc := &corev1.PersistentVolumeClaim{}
@@ -212,7 +212,7 @@ func (r *CodeServerReconciler) reconcilePVC(ctx context.Context, codeServer csv1
 	return nil
 }
 
-func (r *CodeServerReconciler) reconcileDeployment(ctx context.Context, codeServer csv1alpha1.CodeServer) error {
+func (r *CodeServerReconciler) reconcileDeployment(ctx context.Context, codeServer csv1alpha2.CodeServer) error {
 	logger := log.FromContext(ctx)
 
 	owner, err := controllerReference(codeServer, r.Scheme)
@@ -288,7 +288,7 @@ func (r *CodeServerReconciler) reconcileDeployment(ctx context.Context, codeServ
 		)
 	}
 
-	command := fmt.Sprintf("/usr/bin/entrypoint.sh --bind-addr 0.0.0.0:%d", codeServer.Spec.ContainerPort)
+	command := fmt.Sprintf("%s && /usr/bin/entrypoint.sh --bind-addr 0.0.0.0:%d", codeServer.Spec.InitCommand, codeServer.Spec.ContainerPort)
 	if _, ok := codeServer.Spec.InitPlugins["git"]; ok {
 		command = fmt.Sprintf("%s /home/coder/work", command)
 	}
@@ -387,7 +387,7 @@ func (r *CodeServerReconciler) reconcileDeployment(ctx context.Context, codeServ
 	return nil
 }
 
-func (r *CodeServerReconciler) reconcileService(ctx context.Context, codeServer csv1alpha1.CodeServer) error {
+func (r *CodeServerReconciler) reconcileService(ctx context.Context, codeServer csv1alpha2.CodeServer) error {
 	logger := log.FromContext(ctx)
 
 	owner, err := controllerReference(codeServer, r.Scheme)
@@ -463,7 +463,7 @@ func (r *CodeServerReconciler) reconcileService(ctx context.Context, codeServer 
 	return nil
 }
 
-func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer csv1alpha1.CodeServer) error {
+func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer csv1alpha2.CodeServer) error {
 	logger := log.FromContext(ctx)
 
 	owner, err := controllerReference(codeServer, r.Scheme)
@@ -564,7 +564,7 @@ func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer 
 // SetupWithManager sets up the controller with the Manager.
 func (r *CodeServerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&csv1alpha1.CodeServer{}).
+		For(&csv1alpha2.CodeServer{}).
 		Owns(&appsv1.Deployment{}).
 		Owns(&corev1.Service{}).
 		Owns(&corev1.PersistentVolumeClaim{}).
@@ -573,7 +573,7 @@ func (r *CodeServerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func controllerReference(codeServer csv1alpha1.CodeServer, scheme *runtime.Scheme) (*metav1apply.OwnerReferenceApplyConfiguration, error) {
+func controllerReference(codeServer csv1alpha2.CodeServer, scheme *runtime.Scheme) (*metav1apply.OwnerReferenceApplyConfiguration, error) {
 	gvk, err := apiutil.GVKForObject(&codeServer, scheme)
 	if err != nil {
 		return nil, err

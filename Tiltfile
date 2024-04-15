@@ -43,5 +43,5 @@ docker_build_with_restart(
 )
 
 local_resource(
-    'Sample', 'kubectl apply -f ./config/samples/cs_v1alpha1_codeserver.yaml',
-    deps=["./config/samples/cs_v1alpha1_codeserver.yaml"])
+    'Sample', 'kubectl apply -f ./config/samples/cs_v1alpha2_codeserver.yaml',
+    deps=["./config/samples/cs_v1alpha2_codeserver.yaml"])

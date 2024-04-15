@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha1
+package v1alpha2
 
 import (
 	corev1 "k8s.io/api/core/v1"
@@ -73,6 +73,9 @@ type CodeServerSpec struct {
 
 	// PublicProxyPorts specifies the public proxy ports for code server
 	PublicProxyPorts []int32 `json:"publicProxyPorts,omitempty"`
+
+	//InitCommand specifies the init commands that will be running to finish before code server running.
+	InitCommand string `json:"initCommands,omitempty"`
 }
 
 // CodeServerStatus defines the observed state of CodeServer

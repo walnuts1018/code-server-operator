@@ -15,8 +15,8 @@ resources:
   domain: walnuts.dev
   group: cs
   kind: CodeServer
-  path: github.com/walnuts1018/code-server-operator/api/v1alpha1
-  version: v1alpha1
+  path: github.com/walnuts1018/code-server-operator/api/v1alpha2
+  version: v1alpha2
   webhooks:
     defaulting: true
     validation: true
@@ -28,6 +28,6 @@ resources:
   domain: walnuts.dev
   group: cs
   kind: CodeServerDeployment
-  path: github.com/walnuts1018/code-server-operator/api/v1alpha1
-  version: v1alpha1
+  path: github.com/walnuts1018/code-server-operator/api/v1alpha2
+  version: v1alpha2
 version: "3"

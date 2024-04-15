@@ -13,14 +13,14 @@ webhooks:
     service:
       name: '{{ include "code-server-operator.fullname" . }}-webhook-service'
       namespace: '{{ .Release.Namespace }}'
-      path: /validate-cs-walnuts-dev-v1alpha1-codeserver
+      path: /validate-cs-walnuts-dev-v1alpha2-codeserver
   failurePolicy: Fail
   name: vcodeserver.kb.io
   rules:
   - apiGroups:
     - cs.walnuts.dev
     apiVersions:
-    - v1alpha1
+    - v1alpha2
     operations:
     - CREATE
     - UPDATE

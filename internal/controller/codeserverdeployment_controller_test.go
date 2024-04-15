@@ -27,7 +27,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	csv1alpha1 "github.com/walnuts1018/code-server-operator/api/v1alpha1"
+	csv1alpha2 "github.com/walnuts1018/code-server-operator/api/v1alpha2"
 )
 
 var _ = Describe("CodeServerDeployment Controller", func() {
@@ -40,13 +40,13 @@ var _ = Describe("CodeServerDeployment Controller", func() {
 			Name:      resourceName,
 			Namespace: "default", // TODO(user):Modify as needed
 		}
-		codeserverdeployment := &csv1alpha1.CodeServerDeployment{}
+		codeserverdeployment := &csv1alpha2.CodeServerDeployment{}
 
 		BeforeEach(func() {
 			By("creating the custom resource for the Kind CodeServerDeployment")
 			err := k8sClient.Get(ctx, typeNamespacedName, codeserverdeployment)
 			if err != nil && errors.IsNotFound(err) {
-				resource := &csv1alpha1.CodeServerDeployment{
+				resource := &csv1alpha2.CodeServerDeployment{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      resourceName,
 						Namespace: "default",
@@ -59,7 +59,7 @@ var _ = Describe("CodeServerDeployment Controller", func() {
 
 		AfterEach(func() {
 			// TODO(user): Cleanup logic after each test, like removing the resource instance.
-			resource := &csv1alpha1.CodeServerDeployment{}
+			resource := &csv1alpha2.CodeServerDeployment{}
 			err := k8sClient.Get(ctx, typeNamespacedName, resource)
 			Expect(err).NotTo(HaveOccurred())
 

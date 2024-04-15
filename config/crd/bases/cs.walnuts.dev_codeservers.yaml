@@ -23,7 +23,7 @@ spec:
       jsonPath: .spec.storageSize
       name: STORAGE
       type: string
-    name: v1alpha1
+    name: v1alpha2
     schema:
       openAPIV3Schema:
         description: CodeServer is the Schema for the codeservers API
@@ -192,6 +192,10 @@ spec:
                   x-kubernetes-map-type: atomic
                 type: array
               ingressClassName:
+                type: string
+              initCommands:
+                description: InitCommand specifies the init commands that will be
+                  running to finish before code server running.
                 type: string
               initPlugins:
                 additionalProperties:

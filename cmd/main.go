@@ -34,7 +34,7 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	csv1alpha1 "github.com/walnuts1018/code-server-operator/api/v1alpha1"
+	csv1alpha2 "github.com/walnuts1018/code-server-operator/api/v1alpha2"
 	"github.com/walnuts1018/code-server-operator/internal/controller"
 	//+kubebuilder:scaffold:imports
 )
@@ -47,7 +47,8 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(csv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(csv1alpha2.AddToScheme(scheme))
+	utilruntime.Must(csv1alpha2.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -130,7 +131,7 @@ func main() {
 		os.Exit(1)
 	}
 	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
-		if err = (&csv1alpha1.CodeServer{}).SetupWebhookWithManager(mgr); err != nil {
+		if err = (&csv1alpha2.CodeServer{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "CodeServer")
 			os.Exit(1)
 		}

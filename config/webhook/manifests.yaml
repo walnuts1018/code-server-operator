@@ -10,14 +10,14 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /mutate-cs-walnuts-dev-v1alpha1-codeserver
+      path: /mutate-cs-walnuts-dev-v1alpha2-codeserver
   failurePolicy: Fail
   name: mcodeserver.kb.io
   rules:
   - apiGroups:
     - cs.walnuts.dev
     apiVersions:
-    - v1alpha1
+    - v1alpha2
     operations:
     - CREATE
     - UPDATE
@@ -36,14 +36,14 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /validate-cs-walnuts-dev-v1alpha1-codeserver
+      path: /validate-cs-walnuts-dev-v1alpha2-codeserver
   failurePolicy: Fail
   name: vcodeserver.kb.io
   rules:
   - apiGroups:
     - cs.walnuts.dev
     apiVersions:
-    - v1alpha1
+    - v1alpha2
     operations:
     - CREATE
     - UPDATE

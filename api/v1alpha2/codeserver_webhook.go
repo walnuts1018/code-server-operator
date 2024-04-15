@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha1
+package v1alpha2
 
 import (
 	"k8s.io/apimachinery/pkg/runtime"
@@ -36,7 +36,7 @@ func (r *CodeServer) SetupWebhookWithManager(mgr ctrl.Manager) error {
 
 // TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 
-//+kubebuilder:webhook:path=/mutate-cs-walnuts-dev-v1alpha1-codeserver,mutating=true,failurePolicy=fail,sideEffects=None,groups=cs.walnuts.dev,resources=codeservers,verbs=create;update,versions=v1alpha1,name=mcodeserver.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/mutate-cs-walnuts-dev-v1alpha2-codeserver,mutating=true,failurePolicy=fail,sideEffects=None,groups=cs.walnuts.dev,resources=codeservers,verbs=create;update,versions=v1alpha2,name=mcodeserver.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &CodeServer{}
 
@@ -48,7 +48,7 @@ func (r *CodeServer) Default() {
 }
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
-//+kubebuilder:webhook:path=/validate-cs-walnuts-dev-v1alpha1-codeserver,mutating=false,failurePolicy=fail,sideEffects=None,groups=cs.walnuts.dev,resources=codeservers,verbs=create;update,versions=v1alpha1,name=vcodeserver.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/validate-cs-walnuts-dev-v1alpha2-codeserver,mutating=false,failurePolicy=fail,sideEffects=None,groups=cs.walnuts.dev,resources=codeservers,verbs=create;update,versions=v1alpha2,name=vcodeserver.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Validator = &CodeServer{}
 

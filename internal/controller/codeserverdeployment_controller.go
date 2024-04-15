@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	csv1alpha1 "github.com/walnuts1018/code-server-operator/api/v1alpha1"
+	csv1alpha2 "github.com/walnuts1018/code-server-operator/api/v1alpha2"
 	"github.com/walnuts1018/code-server-operator/util/random"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -59,7 +59,7 @@ type CodeServerDeploymentReconciler struct {
 func (r *CodeServerDeploymentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
-	var codeServerDeployments csv1alpha1.CodeServerDeployment
+	var codeServerDeployments csv1alpha2.CodeServerDeployment
 
 	err := r.Client.Get(ctx, req.NamespacedName, &codeServerDeployments)
 	if errors.IsNotFound(err) {
@@ -85,11 +85,11 @@ func (r *CodeServerDeploymentReconciler) Reconcile(ctx context.Context, req ctrl
 	return ctrl.Result{}, nil
 }
 
-func (r *CodeServerDeploymentReconciler) reconcileCodeServer(ctx context.Context, codeServerDeployments *csv1alpha1.CodeServerDeployment) error {
+func (r *CodeServerDeploymentReconciler) reconcileCodeServer(ctx context.Context, codeServerDeployments *csv1alpha2.CodeServerDeployment) error {
 	logger := log.FromContext(ctx)
 
 	for {
-		codeServers := csv1alpha1.CodeServerList{}
+		codeServers := csv1alpha2.CodeServerList{}
 		err := r.Client.List(ctx, &codeServers, &client.ListOptions{
 			Namespace: codeServerDeployments.Namespace,
 			LabelSelector: labels.SelectorFromSet(map[string]string{
@@ -122,12 +122,12 @@ func (r *CodeServerDeploymentReconciler) reconcileCodeServer(ctx context.Context
 			return err
 		}
 
-		codeServer := &csv1alpha1.CodeServer{}
+		codeServer := &csv1alpha2.CodeServer{}
 		codeServer.Name = codeServerDeployments.Name + "-" + suffix
 		codeServer.Namespace = codeServerDeployments.Namespace
 
 		patch := &unstructured.Unstructured{}
-		patch.SetGroupVersionKind(csv1alpha1.GroupVersion.WithKind("CodeServer"))
+		patch.SetGroupVersionKind(csv1alpha2.GroupVersion.WithKind("CodeServer"))
 		patch.SetNamespace(codeServerDeployments.Namespace)
 		patch.SetName(codeServer.Name)
 		patch.SetLabels(map[string]string{
@@ -163,7 +163,7 @@ func (r *CodeServerDeploymentReconciler) reconcileCodeServer(ctx context.Context
 // SetupWithManager sets up the controller with the Manager.
 func (r *CodeServerDeploymentReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&csv1alpha1.CodeServerDeployment{}).
-		Owns(&csv1alpha1.CodeServer{}).
+		For(&csv1alpha2.CodeServerDeployment{}).
+		Owns(&csv1alpha2.CodeServer{}).
 		Complete(r)
 }
