@@ -288,7 +288,11 @@ func (r *CodeServerReconciler) reconcileDeployment(ctx context.Context, codeServ
 		)
 	}
 
-	command := fmt.Sprintf("%s && /usr/bin/entrypoint.sh --bind-addr 0.0.0.0:%d", codeServer.Spec.InitCommand, codeServer.Spec.ContainerPort)
+	command := fmt.Sprintf("/usr/bin/entrypoint.sh --bind-addr 0.0.0.0:%d", codeServer.Spec.ContainerPort)
+	if codeServer.Spec.InitCommand != "" {
+		command = fmt.Sprintf("%s && %s", codeServer.Spec.InitCommand, command)
+	}
+
 	if _, ok := codeServer.Spec.InitPlugins["git"]; ok {
 		command = fmt.Sprintf("%s /home/coder/work", command)
 	}
