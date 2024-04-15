@@ -12,6 +12,7 @@ type gitPlugin struct {
 	Repourl     string `required:"true" json:"repourl"`
 	Branch      string `json:"branch"`
 	VolumeName  string `required:"true" json:"volumeName"`
+	Image       string `required:"true" json:"image"`
 	InitCommand string `json:"initCommand"`
 }
 
@@ -38,6 +39,7 @@ func (g *gitPlugin) GenerateInitContainerApplyConfiguration() *corev1apply.Conta
 	command := fmt.Sprintf(`
 		if [ ! -d /persistent/work ]; then
 			mkdir -p /persistent/work;
+			sudo apt install -y git;
 			git clone -b `+g.Branch+` `+g.Repourl+` /persistent/work;
 			%v
 		else
@@ -47,7 +49,7 @@ func (g *gitPlugin) GenerateInitContainerApplyConfiguration() *corev1apply.Conta
 
 	initcontainer := corev1apply.Container().
 		WithName("git").
-		WithImage("alpine/git").
+		WithImage(g.Image).
 		WithCommand("sh", "-c", command).
 		WithVolumeMounts(corev1apply.VolumeMount().
 			WithName(g.VolumeName).
