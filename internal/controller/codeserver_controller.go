@@ -254,31 +254,36 @@ func (r *CodeServerReconciler) reconcileDeployment(ctx context.Context, codeServ
 		})
 	if codeServer.Spec.Resources.Limits != nil {
 		cpu, ok := codeServer.Spec.Resources.Limits[corev1.ResourceCPU]
-		if ok {
-			resourceRequirements = resourceRequirements.WithLimits(corev1.ResourceList{
-				corev1.ResourceCPU: cpu,
-			})
+		if !ok {
+			cpu = resource.Quantity{}
 		}
-		memory, ok := codeServer.Spec.Resources.Limits[corev1.ResourceMemory]
-		if ok {
-			resourceRequirements = resourceRequirements.WithLimits(corev1.ResourceList{
-				corev1.ResourceMemory: memory,
-			})
+
+		mem, ok := codeServer.Spec.Resources.Limits[corev1.ResourceMemory]
+		if !ok {
+			mem = resource.Quantity{}
 		}
+
+		resourceRequirements = resourceRequirements.WithLimits(corev1.ResourceList{
+			corev1.ResourceCPU:    cpu,
+			corev1.ResourceMemory: mem,
+		})
 	}
+
 	if codeServer.Spec.Resources.Requests != nil {
 		cpu, ok := codeServer.Spec.Resources.Requests[corev1.ResourceCPU]
-		if ok {
-			resourceRequirements = resourceRequirements.WithRequests(corev1.ResourceList{
-				corev1.ResourceCPU: cpu,
-			})
+		if !ok {
+			cpu = resource.Quantity{}
 		}
-		memory, ok := codeServer.Spec.Resources.Requests[corev1.ResourceMemory]
-		if ok {
-			resourceRequirements = resourceRequirements.WithRequests(corev1.ResourceList{
-				corev1.ResourceMemory: memory,
-			})
+
+		mem, ok := codeServer.Spec.Resources.Requests[corev1.ResourceMemory]
+		if !ok {
+			mem = resource.Quantity{}
 		}
+
+		resourceRequirements = resourceRequirements.WithRequests(corev1.ResourceList{
+			corev1.ResourceCPU:    cpu,
+			corev1.ResourceMemory: mem,
+		})
 	}
 
 	imagePullSecrets := make([]*corev1apply.LocalObjectReferenceApplyConfiguration, 0, len(codeServer.Spec.ImagePullSecrets))
