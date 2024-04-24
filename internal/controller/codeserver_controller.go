@@ -117,7 +117,7 @@ func (r *CodeServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	return ctrl.Result{}, nil
+	return r.updateStatus(ctx, codeServer)
 }
 
 func (r *CodeServerReconciler) reconcileSecret(ctx context.Context, codeServer csv1alpha2.CodeServer) error {
@@ -568,6 +568,34 @@ func (r *CodeServerReconciler) reconcileIngress(ctx context.Context, codeServer 
 	logger.Info("Ingress has been reconciled.", "name", codeServer.Name, "namespace", codeServer.Namespace)
 
 	return nil
+}
+
+func (r *CodeServerReconciler) updateStatus(ctx context.Context, codeServer csv1alpha2.CodeServer) (ctrl.Result, error) {
+	var dep appsv1.Deployment
+	err := r.Get(ctx, client.ObjectKey{Name: codeServer.Name, Namespace: codeServer.Namespace}, &dep)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	var status csv1alpha2.CodeServerStatus
+	if dep.Status.AvailableReplicas == 0 {
+		status = csv1alpha2.CodeServerNotReady
+	} else {
+		status = csv1alpha2.CodeServerReady
+	}
+
+	if codeServer.Status != status {
+		codeServer.Status = status
+		err = r.Status().Update(ctx, &codeServer)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
+	if codeServer.Status == csv1alpha2.CodeServerNotReady {
+		return ctrl.Result{Requeue: true}, nil
+	}
+	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
