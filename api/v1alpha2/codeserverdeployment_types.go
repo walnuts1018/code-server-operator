@@ -42,9 +42,10 @@ type CodeServerDeploymentStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="REPLICAS",type="integer",JSONPath=".spec.replicas",description="Number of replicas"
+// +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
 // CodeServerDeployment is the Schema for the codeserverdeployments API
 type CodeServerDeployment struct {
 	metav1.TypeMeta   `json:",inline"`

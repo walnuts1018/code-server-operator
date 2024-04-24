@@ -19,6 +19,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	csv1alpha2 "github.com/walnuts1018/code-server-operator/api/v1alpha2"
 	"github.com/walnuts1018/code-server-operator/util/random"
@@ -30,6 +31,7 @@ import (
 	"k8s.io/utils/ptr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
@@ -88,34 +90,64 @@ func (r *CodeServerDeploymentReconciler) Reconcile(ctx context.Context, req ctrl
 func (r *CodeServerDeploymentReconciler) reconcileCodeServer(ctx context.Context, codeServerDeployments *csv1alpha2.CodeServerDeployment) error {
 	logger := log.FromContext(ctx)
 
-	for {
-		codeServers := csv1alpha2.CodeServerList{}
-		err := r.Client.List(ctx, &codeServers, &client.ListOptions{
-			Namespace: codeServerDeployments.Namespace,
-			LabelSelector: labels.SelectorFromSet(map[string]string{
+	codeServers := csv1alpha2.CodeServerList{}
+	err := r.Client.List(ctx, &codeServers, &client.ListOptions{
+		Namespace: codeServerDeployments.Namespace,
+		LabelSelector: labels.SelectorFromSet(map[string]string{
+			"app.kubernetes.io/name":              CodeServer,
+			"cs.walnuts.dev/codeserverdeployment": codeServerDeployments.Name,
+		}),
+	})
+
+	if err != nil && !errors.IsNotFound(err) {
+		return fmt.Errorf("failed to list CodeServer: %w", err)
+	}
+
+	// 既存のCodeServerのSpecとCodeServerDeploymentのSpecが一致しているか確認
+	for _, codeServer := range codeServers.Items {
+		if !reflect.DeepEqual(codeServer.Spec, codeServerDeployments.Spec.Template.Spec) {
+			patch := &unstructured.Unstructured{}
+			patch.SetGroupVersionKind(csv1alpha2.GroupVersion.WithKind("CodeServer"))
+			patch.SetNamespace(codeServerDeployments.Namespace)
+			patch.SetName(codeServer.Name)
+			patch.SetLabels(map[string]string{
 				"app.kubernetes.io/name":              CodeServer,
+				"app.kubernetes.io/instance":          codeServer.Name,
+				"app.kubernetes.io/created-by":        CodeServerManager,
 				"cs.walnuts.dev/codeserverdeployment": codeServerDeployments.Name,
-			}),
-		})
+			})
+			patch.UnstructuredContent()["spec"] = codeServerDeployments.Spec.Template.Spec
+			patch.SetOwnerReferences([]metav1.OwnerReference{
+				{
+					APIVersion:         codeServerDeployments.APIVersion,
+					Kind:               codeServerDeployments.Kind,
+					Name:               codeServerDeployments.Name,
+					UID:                codeServerDeployments.UID,
+					Controller:         func(b bool) *bool { return &b }(true),
+					BlockOwnerDeletion: func(b bool) *bool { return &b }(true),
+				},
+			})
 
-		if err != nil && !errors.IsNotFound(err) {
-			return fmt.Errorf("failed to list CodeServer: %w", err)
-		}
-
-		nowReplicas := int32(len(codeServers.Items))
-
-		if nowReplicas == codeServerDeployments.Spec.Replicas {
-			break
-		}
-
-		if nowReplicas > codeServerDeployments.Spec.Replicas {
-			codeServer := &codeServers.Items[0]
-			if err := r.Client.Delete(ctx, codeServer); err != nil {
-				return fmt.Errorf("failed to delete CodeServer: %w", err)
+			if err := r.Patch(ctx, patch, client.Apply, &client.PatchOptions{FieldManager: CodeServerManager, Force: ptr.To(true)}); err != nil {
+				return fmt.Errorf("failed to apply CodeServer: %w", err)
 			}
-			continue
+			logger.Info("Patched CodeServer", "Name", codeServer.Name)
 		}
+	}
 
+	nowReplicas := int32(len(codeServers.Items))
+	if nowReplicas == codeServerDeployments.Spec.Replicas {
+		return nil
+	}
+
+	for i := nowReplicas; i > codeServerDeployments.Spec.Replicas; i-- {
+		codeServer := &codeServers.Items[i-1]
+		if err := r.Client.Delete(ctx, codeServer); err != nil {
+			return fmt.Errorf("failed to delete CodeServer: %w", err)
+		}
+	}
+
+	for i := nowReplicas; i < codeServerDeployments.Spec.Replicas; i++ {
 		suffix, err := random.String(6, random.LowerLetters)
 		if err != nil {
 			logger.Error(err, "Failed to generate random string")
@@ -126,30 +158,27 @@ func (r *CodeServerDeploymentReconciler) reconcileCodeServer(ctx context.Context
 		codeServer.Name = codeServerDeployments.Name + "-" + suffix
 		codeServer.Namespace = codeServerDeployments.Namespace
 
-		patch := &unstructured.Unstructured{}
-		patch.SetGroupVersionKind(csv1alpha2.GroupVersion.WithKind("CodeServer"))
-		patch.SetNamespace(codeServerDeployments.Namespace)
-		patch.SetName(codeServer.Name)
-		patch.SetLabels(map[string]string{
-			"app.kubernetes.io/name":              CodeServer,
-			"app.kubernetes.io/instance":          codeServer.Name,
-			"app.kubernetes.io/created-by":        CodeServerManager,
-			"cs.walnuts.dev/codeserverdeployment": codeServerDeployments.Name,
-		})
-		patch.UnstructuredContent()["spec"] = codeServerDeployments.Spec.Template.Spec
-		patch.SetOwnerReferences([]metav1.OwnerReference{
-			{
-				APIVersion:         codeServerDeployments.APIVersion,
-				Kind:               codeServerDeployments.Kind,
-				Name:               codeServerDeployments.Name,
-				UID:                codeServerDeployments.UID,
-				Controller:         func(b bool) *bool { return &b }(true),
-				BlockOwnerDeletion: func(b bool) *bool { return &b }(true),
-			},
+		op, err := ctrl.CreateOrUpdate(ctx, r.Client, codeServer, func() error {
+			codeServer.Spec = codeServerDeployments.Spec.Template.Spec
+
+			if codeServer.Labels == nil {
+				codeServer.Labels = make(map[string]string)
+			}
+
+			codeServer.Labels["app.kubernetes.io/name"] = CodeServer
+			codeServer.Labels["app.kubernetes.io/instance"] = codeServer.Name
+			codeServer.Labels["app.kubernetes.io/created-by"] = CodeServerManager
+			codeServer.Labels["cs.walnuts.dev/codeserverdeployment"] = codeServerDeployments.Name
+
+			return ctrl.SetControllerReference(codeServerDeployments, codeServer, r.Scheme)
 		})
 
-		if err := r.Patch(ctx, patch, client.Apply, &client.PatchOptions{FieldManager: CodeServerManager, Force: ptr.To(true)}); err != nil {
-			return fmt.Errorf("failed to apply CodeServer: %w", err)
+		if err != nil {
+			return fmt.Errorf("failed to reconcile CodeServer: %w", err)
+		}
+
+		if op != controllerutil.OperationResultNone {
+			logger.Info("Reconciled CodeServer", "operation", op)
 		}
 
 		continue

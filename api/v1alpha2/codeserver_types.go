@@ -90,8 +90,9 @@ const (
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="RUNTIME",type="string",JSONPath=".spec.runtime",description="Runtime type"
 //+kubebuilder:printcolumn:name="STORAGE",type="string",JSONPath=".spec.storageSize",description="Storage size"
+//+kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status",description="CodeServer status"
+//+kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
 
 // CodeServer is the Schema for the codeservers API
 type CodeServer struct {

@@ -14,7 +14,15 @@ spec:
     singular: codeserverdeployment
   scope: Namespaced
   versions:
-  - name: v1alpha2
+  - additionalPrinterColumns:
+    - description: Number of replicas
+      jsonPath: .spec.replicas
+      name: REPLICAS
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1alpha2
     schema:
       openAPIV3Schema:
         description: CodeServerDeployment is the Schema for the codeserverdeployments

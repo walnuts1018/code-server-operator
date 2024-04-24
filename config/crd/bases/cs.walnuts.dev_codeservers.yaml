@@ -15,14 +15,17 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - description: Runtime type
-      jsonPath: .spec.runtime
-      name: RUNTIME
-      type: string
     - description: Storage size
       jsonPath: .spec.storageSize
       name: STORAGE
       type: string
+    - description: CodeServer status
+      jsonPath: .status
+      name: STATUS
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
     name: v1alpha2
     schema:
       openAPIV3Schema:
