@@ -8,7 +8,7 @@ require (
 	github.com/onsi/gomega v1.33.1
 	k8s.io/api v0.31.0
 	k8s.io/apimachinery v0.31.0
-	k8s.io/client-go v0.29.3
+	k8s.io/client-go v0.31.0
 	sigs.k8s.io/controller-runtime v0.17.2
 )
 
@@ -55,7 +55,7 @@ require (
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0 // indirect
 	golang.org/x/net v0.26.0 // indirect
-	golang.org/x/oauth2 v0.19.0 // indirect
+	golang.org/x/oauth2 v0.21.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/term v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
