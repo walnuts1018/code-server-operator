@@ -4,6 +4,7 @@
     "config:recommended",
     "github>aquaproj/aqua-renovate-config#2.6.0"
   ],
+  "forkProcessing": "enabled",
   customManagers: [
     {
       customType: "regex",
