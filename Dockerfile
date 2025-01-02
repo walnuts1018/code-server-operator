@@ -14,6 +14,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 COPY cmd/main.go cmd/main.go
 COPY api/ api/
 COPY internal/ internal/
+COPY util/ util/
 COPY go.mod go.sum ./
 
 # Build
