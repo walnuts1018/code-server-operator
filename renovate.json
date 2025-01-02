@@ -13,7 +13,7 @@
       "matchStrings": [
         "https:\\/\\/github\\.com\\/(?<depName>.*?)\\/releases\\/download\\/(?<currentValue>[^\\/]+)\\/.*\\s*",
         "https:\\/\\/raw\\.githubusercontent\\.com\\/(?<depName>.*?)\\/refs\\/tags\\/(?<currentValue>[^\\/]+)\\/.*\\s*",
-        "https:\\/\\/raw\\.githubusercontent\\.com\\/(?<depName>[^/]+\\/[^/]+?)\\/(?<currentValue>[^\\/]+?)\\/.*\\s*",
+        "https:\\/\\/raw\\.githubusercontent\\.com\\/(?<depName>[^/]+\\/[^/]+?)\\/(?<currentValue>[^\\/]+?)\\/.*\\s*"
       ],
       "datasourceTemplate": "github-tags"
     }
