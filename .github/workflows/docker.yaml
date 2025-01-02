@@ -1,24 +1,13 @@
-name: Build Docker Image
+name: Release
 on:
   release:
     types: [published]
 
 jobs:
-  ImageBuild:
-    name: Build Code-Server-Operator Custom Docker Image
+  image-build:
+    name: Build Docker Image
     runs-on: ubuntu-latest
     steps:
-      - name: Slack notification of build start
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_USERNAME: GitHub Actions
-          SLACK_COLOR: "#4381de"
-          SLACK_ICON: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-          SLACK_TITLE: Start Code-Server-Operator image build
-          SLACK_MESSAGE: |
-            Run number : #${{ github.run_number }}
-
       - name: Check out
         uses: actions/checkout@v4
 
@@ -53,7 +42,7 @@ jobs:
 
   chart-release:
     runs-on: ubuntu-latest
-    needs: ImageBuild
+    needs: image-build
     if: ${{ success() }}
     steps:
       - name: Checkout
@@ -73,7 +62,7 @@ jobs:
           # Helm Chart のリリースノートには、本体のリリースへのリンクを追加する
           tag_version=${GITHUB_REF##*/}
           cat <<EOF > ./charts/code-server-operator/RELEASE.md
-          Helm chart for Website Operator [$tag_version](https://github.com/walnuts1018/code-server-operator/releases/tag/$tag_version)
+          Helm chart [$tag_version](https://github.com/walnuts1018/code-server-operator/releases/tag/$tag_version)
 
           EOF
 
@@ -91,38 +80,3 @@ jobs:
           config: cr.yaml
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-  SucceessNotification:
-    if: ${{ success() }}
-    name: Send Success Message
-    needs: [chart-release]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send Message to Slack
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_USERNAME: GitHub Actions
-          SLACK_ICON: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-          SLACK_TITLE: Code-Server-Operator image build succeeded
-          SLACK_MESSAGE: |
-            Image: Code-Server-Operator
-            Run number : #${{ github.run_number }}
-
-  FailureAlert:
-    if: ${{ failure() }}
-    name: Notify failure
-    needs: [chart-release]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send Failure Alert to Slack
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_USERNAME: GitHub Actions
-          SLACK_ICON: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-          SLACK_TITLE: Code-Server-Operator image build failed
-          SLACK_COLOR: danger
-          SLACK_MESSAGE: |
-            Image: Code-Server-Operator
-            Run number : #${{ github.run_number }}
