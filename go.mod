@@ -2,7 +2,7 @@ module github.com/walnuts1018/code-server-operator
 
 go 1.23.0
 
-toolchain go1.23.4
+toolchain go1.23.5
 
 require (
 	github.com/onsi/ginkgo/v2 v2.22.2
