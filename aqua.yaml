@@ -13,6 +13,6 @@ packages:
 - name: kubernetes/kubectl@v1.35.0
 - name: kubernetes-sigs/kubebuilder@v4.5.1
 - name: kubernetes-sigs/kind@v0.31.0
-- name: tilt-dev/tilt@v0.34.1
+- name: tilt-dev/tilt@v0.36.0
 - name: tilt-dev/ctlptl@v0.8.44
 - name: arttor/helmify@v0.4.19
