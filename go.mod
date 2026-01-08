@@ -3,7 +3,7 @@ module github.com/walnuts1018/code-server-operator
 go 1.24.1
 
 require (
-	github.com/onsi/ginkgo/v2 v2.27.3
+	github.com/onsi/ginkgo/v2 v2.27.4
 	github.com/onsi/gomega v1.38.3
 	k8s.io/api v0.32.2
 	k8s.io/apimachinery v0.32.2
