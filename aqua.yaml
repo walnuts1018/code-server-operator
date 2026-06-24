@@ -15,4 +15,4 @@ packages:
 - name: kubernetes-sigs/kind@v0.31.0
 - name: tilt-dev/tilt@v0.36.0
 - name: tilt-dev/ctlptl@v0.8.44
-- name: arttor/helmify@v0.4.19
+- name: arttor/helmify@v0.4.20
