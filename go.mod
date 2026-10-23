@@ -1,6 +1,6 @@
 module github.com/walnuts1018/code-server-operator
 
-go 1.24.1
+go 1.26
 
 require (
 	github.com/onsi/ginkgo/v2 v2.27.3
@@ -8,7 +8,7 @@ require (
 	k8s.io/api v0.32.2
 	k8s.io/apimachinery v0.32.2
 	k8s.io/client-go v0.32.2
-	k8s.io/utils v0.0.0-20251222233032-718f0e51e6d2
+	k8s.io/utils v0.0.0-20261023123148-ca04ba58ecab
 	sigs.k8s.io/controller-runtime v0.19.7
 )
 
