@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM golang:1.25 AS builder
+FROM golang:1.25@sha256:699337d620559a59b4a2bb298ad59611e535d2ee755a34cf2d2a98f37578dc80 AS builder
 ARG TARGETOS
 ARG TARGETARCH
 
@@ -29,7 +29,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
+FROM gcr.io/distroless/static:nonroot@sha256:18f4cc26c9ffa7f20a359298be7deadac5c607c8e03a02b8119f1a5fc2f82c99
 WORKDIR /
 COPY --from=builder /workspace/manager .
 USER 65532:65532
